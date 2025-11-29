@@ -1,0 +1,10 @@
+- name: Roll back {{ app_name }} on Debian Tomcat hosts
+  hosts: debian_tomcat
+  become: yes
+  vars:
+    ansible_become_method: sudo
+    app_name: my-webapp
+  roles:
+    - role: tomcat
+      tasks_from: rollback.yml
+

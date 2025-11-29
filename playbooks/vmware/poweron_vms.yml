@@ -1,0 +1,17 @@
+- name: Power on lab VMs
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vms.yml
+
+  tasks:
+    - name: Power on VM
+      community.vmware.vmware_guest_powerstate:
+        hostname: vCSA.blue.local
+        username: administrator@vsphere.local
+        password: "{{ vcenter_password }}"
+        validate_certs: false
+        datacenter: FB-Datacentre
+        name: "{{ item.name }}"
+        state: powered-on
+      loop: "{{ vms }}"

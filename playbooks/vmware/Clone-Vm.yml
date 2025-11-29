@@ -1,0 +1,43 @@
+---
+- name: Clone new VMs from template
+  hosts: localhost
+  gather_facts: false
+
+  vars_files:
+    - new_vms.yml
+
+  tasks:
+    - name: Deploy VM from template
+      community.vmware.vmware_guest:
+        hostname: vCSA.blue.local
+        username: administrator@vsphere.local
+        password: "{{ vcenter_password }}"
+        validate_certs: false
+        datacenter: FB-Datacentre
+        folder: /Linux
+        name: "{{ item.name }}"
+        template: Deb-01-template
+        state: poweredon
+        hardware:
+          memory_mb: "{{ item.hardware.memory_mb }}"
+          num_cpus: "{{ item.hardware.num_cpus }}"
+        networks:
+          - name: "{{ item.network }}"
+            type: dhcp
+      loop: "{{ new_vms }}"
+      register: vm_results
+
+    - name: Show VM summary
+      ansible.builtin.debug:
+        msg: >-
+          {{ item.instance.hw_name }} | power={{ item.instance.hw_power_status }}
+          vcpus={{ item.instance.hw_processor_count }}
+          ram={{ item.instance.hw_memtotal_mb }}MB
+          host={{ item.instance.hw_esxi_host }}
+          ip={{ item.instance.ipv4 | default('N/A') }}
+      loop: "{{ vm_results.results }}"
+      loop_control:
+        label: "{{ item.instance.hw_name }}"
+
+
+

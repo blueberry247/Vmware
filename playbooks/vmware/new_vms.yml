@@ -1,0 +1,44 @@
+vcenter_password: "Manch3st3r16$"
+
+new_vms:
+  - name: Deb-01
+    folder: Linux
+    network: NESTED-MGMT
+    hardware:
+      memory_mb: 1024
+      num_cpus: 2
+
+  - name: Deb-02
+    folder: Linux
+    network: NESTED-MGMT
+    hardware:
+      memory_mb: 1024
+      num_cpus: 2
+
+  - name: Deb-03
+    folder: Linux
+    network: NESTED-MGMT
+    hardware:
+      memory_mb: 1024
+      num_cpus: 2
+
+  - name: Deb-05
+    folder: Linux
+    network: NESTED-MGMT
+    hardware:
+      memory_mb: 1024
+      num_cpus: 2
+
+  - name: Deb-06
+    folder: Linux
+    network: NESTED-MGMT
+    hardware:
+      memory_mb: 1024
+      num_cpus: 2
+
+  - name: Deb-07        # NEW VM
+    folder: Linux
+    network: NESTED-MGMT
+    hardware:
+      memory_mb: 1024
+      num_cpus: 2

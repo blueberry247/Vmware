@@ -1,0 +1,20 @@
+all:
+  children:
+    debian_tomcat:
+      hosts:
+        Deb-01:
+          ansible_host: 192.168.1.129
+          ansible_user: bardfox
+        Deb-02:
+          ansible_host: 192.168.1.185
+          ansible_user: bardfox
+        Deb-03:
+          ansible_host: 192.168.1.116
+          ansible_user: bardfox
+        Deb-05:
+          ansible_host: 192.168.1.107
+          ansible_user: bardfox
+        Deb-06:
+          ansible_host: 192.168.1.150
+          ansible_user: bardfox
+
