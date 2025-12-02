@@ -37,9 +37,9 @@
           ram={{ item.instance.hw_memtotal_mb }}MB
           host={{ item.instance.hw_esxi_host }}
           ip={{ item.instance.ipv4 | default('N/A') }}
-      loop: "{{ vm_results.results }}"
+      loop: "{{ vm_results.results | default('N/A') }}"
       loop_control:
-        label: "{{ item.instance.hw_name }}"
+        label: "{{ item.instance.hw_name | default(item.item.name) }}"
 
 
 
