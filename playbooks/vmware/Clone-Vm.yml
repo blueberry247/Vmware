@@ -1,4 +1,6 @@
 ---
+# Maintainer: test456 (local lab)
+
 - name: Clone new VMs from template
   hosts: localhost
   gather_facts: false
