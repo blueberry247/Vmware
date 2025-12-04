@@ -4,10 +4,10 @@ all:
       hosts:
         Deb-01:
           ansible_host: 192.168.1.128
-          ansible_user: bardfox
+          ansible_user: ansible
         Deb-02:
           ansible_host: 192.168.1.185
-          ansible_user: bardfox
+          ansible_user: ansible
         Deb-03:
           ansible_host: 192.168.1.116
           ansible_user: bardfox
