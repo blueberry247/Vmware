@@ -1,0 +1,17 @@
+tomcat_version: 9.0.80
+tomcat_archive_url: "https://apache.root.lu/tomcat/tomcat-9/v{{ tomcat_version }}/bin/apache-tomcat-{{ tomcat_version }}.tar.gz"
+
+java_package: default-jdk
+
+tomcat_group: tomcat
+tomcat_user: tomcat
+
+tomcat_home: /opt/tomcat
+tomcat_install_dir: /opt/tomcat
+tomcat_webapps_dir: "{{ tomcat_install_dir }}/apache-tomcat-{{ tomcat_version }}/webapps"
+
+app_name: my-webapp          # context path -> /my-webapp
+app_war_file: my-webapp.war  # file in roles/tomcat/files
+  
+tomcat_service_name: tomcat
+

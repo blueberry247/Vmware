@@ -3,18 +3,23 @@ all:
     debian_tomcat:
       hosts:
         Deb-01:
-          ansible_host: 192.168.1.129
-          ansible_user: bardfox
+          ansible_host: 192.168.1.128
+          ansible_user: ansible
         Deb-02:
           ansible_host: 192.168.1.185
-          ansible_user: bardfox
+          ansible_user: ansible
         Deb-03:
-          ansible_host: 192.168.1.116
-          ansible_user: bardfox
+          ansible_host: 192.168.1.212
+          ansible_user: ansible
         Deb-05:
           ansible_host: 192.168.1.107
-          ansible_user: bardfox
+          ansible_user: ansible
         Deb-06:
           ansible_host: 192.168.1.150
-          ansible_user: bardfox
-
+          ansible_user: ansible
+        Deb-07:
+          ansible_host: 192.168.1.161
+          ansible_user: ansible
+        Deb-08:
+          ansible_host: 192.168.1.188
+          ansible_user: ansible

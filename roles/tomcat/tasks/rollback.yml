@@ -1,0 +1,22 @@
+- name: Find latest backup WAR
+  ansible.builtin.find:
+    paths: "{{ tomcat_home }}/backups"
+    patterns: "{{ app_name }}-*.war"
+    age_stamp: mtime
+  register: backup_files
+
+- name: Fail if no backup WAR found
+  ansible.builtin.fail:
+    msg: "No backup WAR found for {{ app_name }} in {{ tomcat_home }}/backups"
+  when: backup_files.files | length == 0
+
+- name: Restore latest backup WAR
+  ansible.builtin.copy:
+    src: "{{ backup_files.files | sort(attribute='mtime') | last.path }}"
+    dest: "{{ tomcat_webapps_dir }}/{{ app_name }}.war"
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+    mode: "0644"
+    remote_src: yes
+  notify: Restart tomcat
+

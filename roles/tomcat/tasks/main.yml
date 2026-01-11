@@ -1,0 +1,141 @@
+- name: Ensure APT cache is up to date
+  ansible.builtin.apt:
+    update_cache: yes
+  become: yes
+
+- name: Ensure Java is installed (Debian)
+  ansible.builtin.apt:
+    name: "{{ java_package }}"
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "Debian"    
+  become: yes
+
+- name: Ensure tomcat group exists
+  ansible.builtin.group:
+    name: "{{ tomcat_group }}"
+    state: present
+  become: yes
+
+- name: Ensure tomcat user exists
+  ansible.builtin.user:
+    name: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+    shell: /usr/sbin/nologin
+    system: yes
+    create_home: no
+  become: yes
+
+- name: Create install dir
+  ansible.builtin.file:
+    path: "{{ tomcat_install_dir }}"
+    state: directory
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+    mode: "0755"
+  become: yes
+
+- name: Download Tomcat archive
+  ansible.builtin.get_url:
+    url: "{{ tomcat_archive_url }}"
+    dest: "/tmp/apache-tomcat-{{ tomcat_version }}.tar.gz"
+    mode: "0644"
+  become: yes
+
+- name: Extract Tomcat
+  ansible.builtin.unarchive:
+    src: "/tmp/apache-tomcat-{{ tomcat_version }}.tar.gz"
+    dest: "{{ tomcat_install_dir }}"
+    remote_src: yes
+    creates: "{{ tomcat_install_dir }}/apache-tomcat-{{ tomcat_version }}"
+  become: yes
+
+- name: Symlink current
+  ansible.builtin.file:
+    src: "{{ tomcat_install_dir }}/apache-tomcat-{{ tomcat_version }}"
+    dest: "{{ tomcat_install_dir }}/current"
+    state: link
+  become: yes
+
+- name: Set ownership recursively
+  ansible.builtin.file:
+    path: "{{ tomcat_install_dir }}/apache-tomcat-{{ tomcat_version }}"
+    state: directory
+    recurse: yes
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+  become: yes
+
+- name: Deploy systemd unit
+  ansible.builtin.template:
+    src: tomcat.service.j2
+    dest: /etc/systemd/system/{{ tomcat_service_name }}.service
+  notify: Restart tomcat
+  become: yes
+
+- name: Ensure Tomcat service is enabled and started
+  ansible.builtin.systemd:
+    name: "{{ tomcat_service_name }}"
+    enabled: yes
+    state: started
+    daemon_reload: yes
+  become: yes
+    
+- name: Ensure Tomcat webapps directory exists
+  ansible.builtin.file:
+    path: "{{ tomcat_webapps_dir }}"
+    state: directory
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+    mode: "0755"
+  become: yes
+
+- name: Ensure Tomcat webapps directory exists
+  ansible.builtin.file:
+    path: "{{ tomcat_webapps_dir }}"
+    state: directory
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+    mode: "0755"
+  become: yes
+
+- name: Ensure Tomcat backup directory exists
+  ansible.builtin.file:
+    path: "{{ tomcat_home }}/backups"
+    state: directory
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+    mode: "0755"
+  become: yes
+
+- name: Backup existing WAR if present
+  ansible.builtin.command:
+    cmd: >
+      cp {{ tomcat_webapps_dir }}/{{ app_name }}.war
+         {{ tomcat_home }}/backups/{{ app_name }}-{{ ansible_date_time.iso8601 }}.war
+  args:
+    removes: "{{ tomcat_webapps_dir }}/{{ app_name }}.war"
+  become: yes
+  ignore_errors: yes
+
+- name: Deploy application WAR
+  ansible.builtin.copy:
+    src: "{{ app_war_file }}"
+    dest: "{{ tomcat_webapps_dir }}/{{ app_name }}.war"
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+    mode: "0644"
+  become: yes
+  notify: Restart tomcat
+    
+- name: Wait for app to become healthy
+  ansible.builtin.uri:
+    url: "http://{{ hostvars[inventory_hostname].ansible_host | default('127.0.0.1') }}:8080/{{ app_name }}/"
+    method: GET
+    status_code: 200
+  register: app_health
+  retries: 30
+  delay: 2
+  until: app_health.status == 200
+  become: false
+

@@ -2,7 +2,7 @@
 
 - name: Deploy Tomcat on Debian hosts
   hosts: debian_tomcat
-  become: yes
+  become: false
   vars:
     ansible_become_method: sudo
   serial: 2          # rolling: 2 hosts at a time
